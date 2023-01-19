@@ -1,2 +1,2 @@
 # CS61B
-CS61B sp21
+CS61B Spring 2021, starting from 2023.1.19
