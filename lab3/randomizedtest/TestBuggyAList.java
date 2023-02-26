@@ -29,19 +29,30 @@ public class TestBuggyAList {
   @Test
   public void randomizedTest() {
     AListNoResizing<Integer> L = new AListNoResizing<>();
+    BuggyAList B = new BuggyAList<>();
 
-    int N = 500;
+    int N = 5000;
     for (int i = 0; i < N; i += 1) {
-      int operationNumber = StdRandom.uniform(0, 2);
+      int operationNumber = StdRandom.uniform(0, 4);
       if (operationNumber == 0) {
         // addLast
         int randVal = StdRandom.uniform(0, 100);
         L.addLast(randVal);
-        System.out.println("addLast(" + randVal + ")");
+        B.addLast(randVal);
       } else if (operationNumber == 1) {
         // size
         int size = L.size();
-        System.out.println("size: " + size);
+      }
+      if (L.size() == 0) {
+        continue;
+      }
+      if (operationNumber == 2) {
+        int val = L.getLast();
+        assertEquals(L.getLast(), B.getLast());
+      }
+      if (operationNumber == 3) {
+        int val = L.removeLast();
+        assertEquals(val, (int) B.removeLast());
       }
     }
   }
