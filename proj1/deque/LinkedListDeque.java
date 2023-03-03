@@ -52,7 +52,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         Node tmp = sentinel.next;
         sentinel.next = sentinel.next.next;
         sentinel.next.prev = sentinel;
-        size -= 1;
+        size = (size == 0) ? size : size - 1;
         return tmp.item;
     }
 
@@ -61,7 +61,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         Node tmp = sentinel.prev;
         sentinel.prev = sentinel.prev.prev;
         sentinel.prev.next = sentinel;
-        size -= 1;
+        size = (size == 0) ? size : size - 1;
         return tmp.item;
     }
 
