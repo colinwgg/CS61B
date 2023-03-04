@@ -1,10 +1,10 @@
 package deque;
 
 public class ArrayDeque<T> implements Deque<T>{
-    private T[] items;
-    private int size;
-    private int nextfirst;
-    private int nextlast;
+    protected T[] items;
+    protected int size;
+    protected int nextfirst;
+    protected int nextlast;
 
     public ArrayDeque() {
         items = (T[]) new Object[8];
@@ -13,11 +13,11 @@ public class ArrayDeque<T> implements Deque<T>{
         nextlast = 1;
     }
 
-    private int addfirstnextindex(int index) {
+    protected int addfirstnextindex(int index) {
         return (index + items.length - 1) % items.length;
     }
 
-    private int addlastnextindex(int index) {
+    protected int addlastnextindex(int index) {
         return (index + 1) % items.length;
     }
 
@@ -33,13 +33,13 @@ public class ArrayDeque<T> implements Deque<T>{
         items = tmp;
     }
 
-    private void check_more() {
+    protected void check_more() {
         if (size == items.length) {
             resize(size * 2);
         }
     }
 
-    private void check_less() {
+    protected void check_less() {
         if (items.length >= 16 && size <items.length / 4) {
             resize(items.length / 4);
         }
