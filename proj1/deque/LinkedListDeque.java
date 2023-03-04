@@ -100,7 +100,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         return getRecursivehelper(n.next, index - 1);
     }
 
-    public boolean equeals(Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof Deque)) {
             return false;
         }

@@ -1,7 +1,7 @@
 package deque;
 
 import java.util.Iterator;
-public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     protected T[] items;
     protected int size;
     protected int nextfirst;
@@ -107,7 +107,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         return items[(nextfirst + 1 + index) % items.length];
     }
 
-    public boolean equeals(Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof Deque)) {
             return false;
         }
