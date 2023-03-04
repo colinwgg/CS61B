@@ -54,7 +54,7 @@ public class ArrayDeque<T> implements Deque<T>{
 
     @Override
     public void addLast(T item) {
-        check_less();
+        check_more();
         items[nextlast] = item;
         nextlast = addlastnextindex(nextlast);
         size += 1;
@@ -103,11 +103,7 @@ public class ArrayDeque<T> implements Deque<T>{
 
     @Override
     public T get(int index) {
-        int index_ = addlastnextindex(nextfirst);
-        for (int i = 0; i < index; i++) {
-            index_ = addlastnextindex(index_);
-        }
-        return items[index_];
+        return items[(nextfirst + 1 + index) % items.length];
     }
 
     public boolean equeals(Object o) {
