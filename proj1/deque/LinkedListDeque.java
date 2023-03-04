@@ -1,7 +1,7 @@
 package deque;
 
 import java.util.Iterator;
-public class LinkedListDeque<T> implements Deque<T> {
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     public class Node {
         private Node prev;
         private Node next;
@@ -78,24 +78,26 @@ public class LinkedListDeque<T> implements Deque<T> {
 
     @Override
     public T get(int index) {
-        Node tmp = sentinel;
-        for (int i = 0; i < index; i++) {
-            tmp = tmp.next;
+        Node p = sentinel.next;
+        while (p != sentinel && index > 0) {
+            p = p.next;
+            index--;
         }
-        return tmp.item;
+        return (index == 0) ? (T) p.item : null;
     }
 
     public T getRecursive(int index) {
-            return getRecursivehelper(sentinel, index);
+        return getRecursivehelper(sentinel.next, index);
     }
 
     public T getRecursivehelper(Node n, int index) {
+        if (n == sentinel) {
+            return null;
+        }
         if (index == 0) {
-            return n.item;
+            return (T) n.item;
         }
-        else {
-            return getRecursivehelper(n.next, index - 1);
-        }
+        return getRecursivehelper(n.next, index - 1);
     }
 
     public boolean equeals(Object o) {
@@ -106,10 +108,12 @@ public class LinkedListDeque<T> implements Deque<T> {
         if (size != oo.size()) {
             return false;
         }
+        Node p = sentinel.next;
         for (int i = 0; i < size; i++) {
-            if (get(i).equals(oo.get(i))) {
+            if (!p.item.equals(oo.get(i))) {
                 return false;
             }
+            p = p.next;
         }
         return true;
     }

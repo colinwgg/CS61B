@@ -1,7 +1,7 @@
 package deque;
 
 import java.util.Iterator;
-public class ArrayDeque<T> implements Deque<T>{
+public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     protected T[] items;
     protected int size;
     protected int nextfirst;
@@ -34,20 +34,20 @@ public class ArrayDeque<T> implements Deque<T>{
         items = tmp;
     }
 
-    protected void check_more() {
+    protected void Check_more() {
         if (size == items.length) {
             resize(size * 2);
         }
     }
 
-    protected void check_less() {
-        if (items.length >= 16 && size <items.length / 4) {
+    protected void Check_less() {
+        if (items.length >= 16 && size < items.length / 4) {
             resize(items.length / 4);
         }
     }
     @Override
     public void addFirst(T item) {
-        check_more();
+        Check_more();
         items[nextfirst] = item;
         nextfirst = addfirstnextindex(nextfirst);
         size += 1;
@@ -55,7 +55,7 @@ public class ArrayDeque<T> implements Deque<T>{
 
     @Override
     public void addLast(T item) {
-        check_more();
+        Check_more();
         items[nextlast] = item;
         nextlast = addlastnextindex(nextlast);
         size += 1;
@@ -75,7 +75,7 @@ public class ArrayDeque<T> implements Deque<T>{
         T tmp = items[nextfirst];
         items[nextfirst] = null;
         size -= 1;
-        check_less();
+        Check_less();
         return tmp;
     }
 
@@ -88,7 +88,7 @@ public class ArrayDeque<T> implements Deque<T>{
         T tmp = items[nextlast];
         items[nextlast] = null;
         size -= 1;
-        check_less();
+        Check_less();
         return tmp;
     }
 
@@ -117,7 +117,7 @@ public class ArrayDeque<T> implements Deque<T>{
         }
         int index = addlastnextindex(nextfirst);
         for (int i = 0; i < size; i++) {
-            if (!items[index].equals(oo.get(i))) {
+            if (!(items[index].equals(oo.get(i)))) {
                 return false;
             }
             index = addlastnextindex(index);

@@ -17,14 +17,14 @@ public class MaxArrayDeque<T> extends ArrayDeque<T>{
             return null;
         }
         int index = addlastnextindex(nextfirst);
-        T max_ = items[index];
+        T Max_ = items[index];
         for (int i = 0; i < size; i++) {
-            if (cmp.compare(items[index], max_) > 0) {
-                max_ = items[index];
+            if (cmp.compare(items[index], Max_) > 0) {
+                Max_ = items[index];
             }
             index = addlastnextindex(index);
         }
-        return max_;
+        return Max_;
     }
 
     public T max(Comparator<T> c) {
@@ -32,13 +32,13 @@ public class MaxArrayDeque<T> extends ArrayDeque<T>{
             return null;
         }
         int index = addlastnextindex(nextfirst);
-        T max_ = items[index];
+        T Max_ = items[index];
         for (int i = 0; i < size; i++) {
-            if (c.compare(items[index], max_) > 0) {
-                max_ = items[index];
+            if (c.compare(items[index], Max_) > 0) {
+                Max_ = items[index];
             }
             index = addlastnextindex(index);
         }
-        return max_;
+        return Max_;
     }
 }
