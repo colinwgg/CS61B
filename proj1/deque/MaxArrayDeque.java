@@ -22,7 +22,7 @@ public class MaxArrayDeque<T> extends ArrayDeque<T>{
             if (cmp.compare(items[index], max_) > 0) {
                 max_ = items[index];
             }
-            index = addlastnextindex(index)
+            index = addlastnextindex(index);
         }
         return max_;
     }
