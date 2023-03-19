@@ -10,7 +10,7 @@ import static capers.Utils.*;
 public class Dog {
 
     /** Folder that dogs live in. */
-    static final File DOG_FOLDER = Utils.join(CapersRepository.CAPERS_FOLDER, "dogs");
+    static final File DOG_FOLDER = Utils.join(".capers", "dogs");
                                          //      function in Utils)
 
     /** Age of dog. */
