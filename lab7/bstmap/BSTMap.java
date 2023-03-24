@@ -72,19 +72,75 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     }
 
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        HashSet<K> set = new HashSet<>();
+        addKeys(root, set);
+        return set;
+    }
+
+    private void addKeys(BSTNode node, Set<K> set) {
+        if (node == null) {
+            return;
+        }
+        set.add(node.key);
+        addKeys(node.left, set);
+        addKeys(node.right, set);
     }
 
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+        if (containsKey(key)) {
+            V value = get(key);
+            root = remove(root, key);
+            size -= 1;
+            return value;
+        }
+        return null;
     }
 
+    private BSTNode remove(BSTNode node, K key) {
+        if (node == null) {
+            return null;
+        }
+        int cmp = key.compareTo(node.key);
+        if (cmp < 0) {
+            node.left = remove(node.left, key);
+        } else if (cmp > 0) {
+            node.right = remove(node.right, key);
+        } else {
+            if (node.left == null) {
+                return node.right;
+            }
+            if (node.right == null) {
+                return node.left;
+            }
+            BSTNode originalNode = node;
+            node = getMinChild(node.right);
+            node.left = originalNode.left;
+            node.right = remove(originalNode.right, node.key);
+        }
+        return node;
+    }
+
+    private BSTNode getMinChild(BSTNode node) {
+        if (node.left == null) {
+            return node;
+        }
+        return getMinChild(node.left);
+    }
+    
     public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+        if (containsKey(key)) {
+            V targetValue = get(key);
+            if (targetValue.equals(value)) {
+                root = remove(root, key);
+                size -= 1;
+                return targetValue;
+            }
+        }
+        return null;
     }
 
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+        return keySet().iterator();
     }
 
     public void printInOrder() {
