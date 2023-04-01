@@ -15,6 +15,7 @@ public class Blob {
     private byte[] content;
 
     public Blob(String filename, File file) {
+        this.filename = filename;
         
     }
 }
