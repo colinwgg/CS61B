@@ -1,18 +1,20 @@
 package gitlet;
 
-// TODO: any imports you need here
+import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
-import java.util.Date; // TODO: You'll likely use this in this class
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
+
+import static gitlet.Utils.*;
 
 /** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
  *
- *  @author TODO
+ *  @author Colin Wang
  */
-public class Commit {
+public class Commit implements Serializable {
     /**
-     * TODO: add instance variables here.
      *
      * List all instance variables of the Commit class here with a useful
      * comment above them describing what that variable represents and how that
@@ -22,5 +24,48 @@ public class Commit {
     /** The message of this Commit. */
     private String message;
 
-    /* TODO: fill in the rest of this class. */
+    /** The timestamp of this Commit */
+    private Date timestamp;
+
+    private List<String> parents;
+
+    /** The file this Commit tracks */
+    private HashMap<String, String> blobs;
+
+    private String id;
+
+    public Commit() {
+        message = "initial commit";
+        timestamp = new Date(0);
+        parents = new LinkedList<>();
+        blobs = new HashMap<>();
+        id = sha1(message, timestamp.toString());
+    }
+
+    public Commit(String message, List<Commit> parents, Stage stage) {
+        this.message = message;
+        this.timestamp = new Date();
+        this.parents = new ArrayList<>(2);
+        for (String p : parents) {
+            this.parents.add(p.getId());
+        }
+        this.blobs = parents.get(0).getBlobs();
+        for (Map.Entry<String, String> item : stage.getAdded().entrySet()) {
+            String filename = item.getKey();
+            String blobId = item.getValue();
+            blobs.put(filename, blobId);
+        }
+        for (String filename : stage.getRemoved()) {
+            blobs.remove(filename);
+        }
+        this.id = sha1(message, timestamp.toString(), parents.toString(), blobs.toString());
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public HashMap<String, String> getBlobs() {
+        return blobs;
+    }
 }
