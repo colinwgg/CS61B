@@ -36,27 +36,46 @@ public class Repository {
       */
     /** The current working directory. */
     public File CWD;
-    public File STAGEING_DIR;
+    public File GITLET_DIR;
+    public File STAGING_DIR;
     public File STAGE;
     public File BLOBS;
     public File COMMITS;
-    public File REF_DIR;
+    public File REFS_DIR;
     public File HEADS_DIR;
     public File REMOTES_DIR;
     public File HEAD;
     public File CONFIG;
-    
+
     public Repository() {
         this.CWD = new File(System.getProperty("user.dir"));
         configDIRS();
     }
     
-    public Repository(File cwd) {
+    public Repository(String cwd) {
         this.CWD = new File(cwd);
         configDIRS();
     }
 
     private void configDIRS() {
+        this.GITLET_DIR = join(CWD, ".gitlet");
+        this.STAGING_DIR = join(GITLET_DIR, "staging");
+        this.STAGE = join(GITLET_DIR, "stage");
+        this.BLOBS = join(GITLET_DIR, "blobs");
+        this.COMMITS = join(GITLET_DIR, "commits");
+        this.REFS_DIR = join(GITLET_DIR, "refs");
+        this.HEADS_DIR = join(REFS_DIR, "heads");
+        this.REMOTES_DIR = join(REFS_DIR, "remotes");
+        this.HEAD = join(GITLET_DIR, "HEAD");
+        this.CONFIG = join(GITLET_DIR, "config");
+    }
 
+    public void init() {
+        if (GITLET_DIR.exists() && GITLET_DIR.isDirectory()) {
+            System.out.println("A Gitlet version-control system already exists in the current directory");
+            System.exti(0);
+        }
+
+        
     }
 }
