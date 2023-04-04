@@ -68,4 +68,37 @@ public class Commit implements Serializable {
     public HashMap<String, String> getBlobs() {
         return blobs;
     }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public List<String> getParents() {
+        return parents;
+    }
+
+    public String getFirstParentId() {
+        if (parents.isEmpty()) {
+            return "null";
+        }
+        return parents.get(0);
+    }
+
+    public String getDateString() {
+        // Thu Nov 9 20:00:05 2017 -0800
+        DateFormat df = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.ENGLISH);
+        return df.format(timestamp);
+    }
+
+    public String getCommitAsString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("===\n");
+        sb.append("commit " + this.id + "\n");
+        if (parents.size() == 2) {
+            sb.append("Merge: " + parents.get(0).substring(0, 7) + " " +parents.get(1).substring(0, 7) + "\n");
+        }
+        sb.append("Date: " + getDateString() + "\n");
+        sb.append(this.message + "\n\n");
+        return sb.toString();
+    }
 }
