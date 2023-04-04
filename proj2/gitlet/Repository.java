@@ -28,14 +28,24 @@ public class Repository {
       * -- blobs
       * -- commits
       * -- ref
-      *     -- heads -> [master][branch name]
-      *     -- remotes -> [remote git repo name] -> [branch name]
-      * -- HEAD
-      * -- config
+      *   -- heads -> [master][branch name]
+      *   -- remotes 
+      *     -- [remote git repo name] -> [branch name]
+      * -- [HEAD]
+      * -- [config]
       */
     /** The current working directory. */
     public File CWD;
-
+    public File STAGEING_DIR;
+    public File STAGE;
+    public File BLOBS;
+    public File COMMITS;
+    public File REF_DIR;
+    public File HEADS_DIR;
+    public File REMOTES_DIR;
+    public File HEAD;
+    public File CONFIG;
+    
     public Repository() {
         this.CWD = new File(System.getProperty("user.dir"));
         configDIRS();
