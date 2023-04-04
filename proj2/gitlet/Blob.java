@@ -18,7 +18,7 @@ public class Blob {
         this.filename = filename;
         File file = join(CWD, filename);
         if (file.exists()) {
-            this.content = readContents(filename);
+            this.content = readContents(file);
             this.id = sha1(filename, content);
         } else {
             this.content = null;

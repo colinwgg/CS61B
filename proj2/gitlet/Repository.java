@@ -1,12 +1,13 @@
 package gitlet;
 
-import java.io.File;
-import java.nio.file.Paths;
+import java.io.*;
+import java.io.ObjectInputFilter.Config;
+import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.*;
-import java.util.function.Consumer;
 
-import static gitlet.MyUtils.*;
 import static gitlet.Utils.*;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /** Represents a gitlet repository.
  *
@@ -14,17 +15,38 @@ import static gitlet.Utils.*;
  */
 public class Repository {
     /**
-     * TODO: add instance variables here.
      *
      * List all instance variables of the Repository class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided two examples for you.
      */
 
+     /**
+      * .gitlet
+      * -- staging
+      * -- [stage]
+      * -- blobs
+      * -- commits
+      * -- ref
+      *     -- heads -> [master][branch name]
+      *     -- remotes -> [remote git repo name] -> [branch name]
+      * -- HEAD
+      * -- config
+      */
     /** The current working directory. */
-    public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet directory. */
-    public static final File GITLET_DIR = join(CWD, ".gitlet");
+    public File CWD;
 
-    /* TODO: fill in the rest of this class. */
+    public Repository() {
+        this.CWD = new File(System.getProperty("user.dir"));
+        configDIRS();
+    }
+    
+    public Repository(File cwd) {
+        this.CWD = new File(cwd);
+        configDIRS();
+    }
+
+    private void configDIRS() {
+
+    }
 }

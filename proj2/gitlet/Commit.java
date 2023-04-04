@@ -46,7 +46,7 @@ public class Commit implements Serializable {
         this.message = message;
         this.timestamp = new Date();
         this.parents = new ArrayList<>(2);
-        for (String p : parents) {
+        for (Commit p : parents) {
             this.parents.add(p.getId());
         }
         this.blobs = parents.get(0).getBlobs();
