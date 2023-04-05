@@ -39,8 +39,8 @@ public class Repository {
     public File GITLET_DIR;
     public File STAGING_DIR;
     public File STAGE;
-    public File BLOBS;
-    public File COMMITS;
+    public File BLOBS_DIR;
+    public File COMMITS_DIR;
     public File REFS_DIR;
     public File HEADS_DIR;
     public File REMOTES_DIR;
@@ -61,8 +61,8 @@ public class Repository {
         this.GITLET_DIR = join(CWD, ".gitlet");
         this.STAGING_DIR = join(GITLET_DIR, "staging");
         this.STAGE = join(GITLET_DIR, "stage");
-        this.BLOBS = join(GITLET_DIR, "blobs");
-        this.COMMITS = join(GITLET_DIR, "commits");
+        this.BLOBS_DIR = join(GITLET_DIR, "blobs");
+        this.COMMITS_DIR = join(GITLET_DIR, "commits");
         this.REFS_DIR = join(GITLET_DIR, "refs");
         this.HEADS_DIR = join(REFS_DIR, "heads");
         this.REMOTES_DIR = join(REFS_DIR, "remotes");
@@ -73,9 +73,45 @@ public class Repository {
     public void init() {
         if (GITLET_DIR.exists() && GITLET_DIR.isDirectory()) {
             System.out.println("A Gitlet version-control system already exists in the current directory");
-            System.exti(0);
+            System.exit(0);
         }
 
+        GITLET_DIR.mkdir();
+        STAGING_DIR.mkdir();
+        writeObject(STAGE, new Stage());
+        BLOBS_DIR.mkdir();
+        COMMITS_DIR.mkdir();
+        REFS_DIR.mkdir();
+        HEADS_DIR.mkdir();
+        REMOTES_DIR.mkdir();
         
+        Commit inititalCommit = new Commit();
+        writeCommitToFile(inititalCommit);
+        String id = inititalCommit.getId();
+
+        String branchName = "master";
+        File master = join(HEADS_DIR, branchName);
+        writeContents(HEAD, branchName);
+        writeContents(master, id);
+
+        writeContents(CONFIG, "");
+    }
+
+    private void writeCommitToFile(Commit commit) {
+        File file = join(COMMITS_DIR, commit.getId());
+        writeObject(file, commit);
+    }
+
+
+    /** check methods */
+    void checkCommandLength(int actual, int expect) {
+        if (actual != expect) {
+            messageIncorrectOperands();
+        }
+    }
+
+    void messageIncorrectOperands() {
+        System.out.println("Incorrect operands.");
+        System.exit(0);
     }
 }

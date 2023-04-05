@@ -18,11 +18,16 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                
+                repo.checkCommandLength(args.length, 1);
+                repo.init();
+                break;
             case "add":
                 // TODO: handle the `add [filename]` command
                 break;
             // TODO: FILL THE REST IN
         }
     }
+
+
+
 }
