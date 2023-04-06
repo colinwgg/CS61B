@@ -21,20 +21,22 @@ public class Repository {
      * variable is used. We've provided two examples for you.
      */
 
-     /**
-      * .gitlet
-      * -- staging
-      * -- [stage]
-      * -- blobs
-      * -- commits
-      * -- ref
-      *   -- heads -> [master][branch name]
-      *   -- remotes 
-      *     -- [remote git repo name] -> [branch name]
-      * -- [HEAD]
-      * -- [config]
-      */
-    /** The current working directory. */
+    /**
+     * .gitlet
+     * -- staging
+     * -- [stage]
+     * -- blobs
+     * -- commits
+     * -- ref
+     *   -- heads -> [master][branch name]
+     *   -- remotes
+     *     -- [remote git repo name] -> [branch name]
+     * -- [HEAD]
+     * -- [config]
+     */
+    /**
+     * The current working directory.
+     */
     public File CWD;
     public File GITLET_DIR;
     public File STAGING_DIR;
@@ -51,7 +53,7 @@ public class Repository {
         this.CWD = new File(System.getProperty("user.dir"));
         configDIRS();
     }
-    
+
     public Repository(String cwd) {
         this.CWD = new File(cwd);
         configDIRS();
@@ -84,7 +86,7 @@ public class Repository {
         REFS_DIR.mkdir();
         HEADS_DIR.mkdir();
         REMOTES_DIR.mkdir();
-        
+
         Commit inititalCommit = new Commit();
         writeCommitToFile(inititalCommit);
         String id = inititalCommit.getId();
@@ -97,15 +99,117 @@ public class Repository {
         writeContents(CONFIG, "");
     }
 
+    /**
+     * 1. Staging an already-staged file overwrites the previous entry in the staging area with the new contents.
+     * 2. If the current working version of the file is identical to the version in the current commit,
+     * do not stage it to be added, and remove it from the staging area if it is already there
+     * (as can happen when a file is changed, added, and then changed back to its original version).
+     * 3. The file will no longer be staged for removal (see gitlet rm), if it was at the time of the command.
+     */
+    public void add(String filename) {
+        File file = join(CWD, filename);
+        if (!file.exists()) {
+            System.out.println("File doesn't exist");
+            System.exit(0);
+        }
+
+        Commit head = getHead();
+        Stage stage = readStage();
+        String headId = head.getBlobs().getOrDefault(filename, "");
+        String stageId = stage.getAdded().getOrDefault(filename, "");
+        Blob blob = new Blob(filename, CWD);
+        String blobId = blob.getId();
+
+        if (blobId.equals(headId)) {
+            if (!blobId.equals(stageId)) {
+                join(STAGING_DIR, stageId).delete();
+                stage.getAdded().remove(stageId);
+                stage.getRemoved().remove(filename);
+                writeStage(stage);
+            }
+        } else if (!blobId.equals(stageId)) {
+            if (!stageId.equals("")) {
+                join(STAGING_DIR, stageId).delete();
+            }
+
+        }
+    }
+
+    /**
+     * helper methods
+     */
+    private Stage readStage() {
+        return readObject(STAGE, Stage.class);
+    }
+
+    private void writeStage(Stage stage) {
+        writeObject(STAGE, stage);
+    }
     private void writeCommitToFile(Commit commit) {
         File file = join(COMMITS_DIR, commit.getId());
         writeObject(file, commit);
     }
 
+    private String getHeadBranchName() {
+        return readContentsAsString(HEAD);
+    }
 
-    /** check methods */
-    void checkCommandLength(int actual, int expect) {
-        if (actual != expect) {
+    private String getCommitIdFromBranchFile(File file) {
+        return readContentsAsString(file);
+    }
+
+    private Commit getCommitFromId(String commitId) {
+        File file = join(COMMITS_DIR, commitId);
+        if (commitId.equals("null") || !file.exists()) {
+            return null;
+        }
+        return readObject(file, Commit.class);
+    }
+
+    private Commit getCommitFromBranchFile(File file) {
+        String commitId = readContentsAsString(file);
+        return getCommitFromId(commitId);
+    }
+
+    /** [branch]
+     *  [R1/branch]
+     */
+    private File getBranchFile(String branchName) {
+        File file = null;
+        String[] branch = branchName.split("/");
+        if (branch.length == 1) {
+            file = join(HEADS_DIR, branchName);
+        } else if(branch.length == 2) {
+            file = join(REMOTES_DIR, branch[0], branch[1]);
+        }
+        return file;
+    }
+    private Commit getCommitFromBranchName(String branchName) {
+        File branchFile = getBranchFile(branchName);
+        return getCommitFromBranchFile(branchFile);
+    }
+
+    private Commit getHead() {
+        String branchName = getHeadBranchName();
+        File branchFile = getBranchFile(branchName);
+        Commit head = getCommitFromBranchFile(branchFile);
+        if (head == null) {
+            System.out.println("error! cannot find HEAD!");
+            System.exit(0);
+        }
+        return head;
+    }
+    /**
+     * check methods
+     */
+    void checkCommandLength(int actual, int expected) {
+        if (actual != expected) {
+            messageIncorrectOperands();
+        }
+    }
+
+    void checkEqual(String actual, String expected) {
+        if (!actual.equals(expected)) {
             messageIncorrectOperands();
         }
     }
@@ -113,5 +217,12 @@ public class Repository {
     void messageIncorrectOperands() {
         System.out.println("Incorrect operands.");
         System.exit(0);
+    }
+
+    void checkIfInitDirectoryExist() {
+        if (!GITLET_DIR.isDirectory()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
     }
 }
