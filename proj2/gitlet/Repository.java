@@ -15,7 +15,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  */
 public class Repository {
     /**
-     *
      * List all instance variables of the Repository class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided two examples for you.
@@ -131,12 +130,43 @@ public class Repository {
             if (!stageId.equals("")) {
                 join(STAGING_DIR, stageId).delete();
             }
-
+            writeObject(join(STAGING_DIR, blobId), blob);
+            stage.addFile(filename, blobId);
+            writeStage(stage);
         }
     }
 
+    public void rm(String filename) {
+        File file = join(CWD, filename);
+        Commit head = getHead();
+        Stage stage = readStage();
+        String headId = head.getBlobs().getOrDefault(filename, "");
+        String stageId = stage.getAdded().getOrDefault(filename, "");
+
+        if (headId.equals("") && stageId.equals("")) {
+            System.out.println("No reason to remove the file.");
+            System.exit(0);
+        }
+
+        /** Unstage the file if it currently staged for addition */
+        if (!stageId.equals("")) {
+            stage.getAdded().remove(stageId);
+        } else {
+            stage.getRemoved().add(stageId);
+        }
+
+        Blob blob = new Blob(filename, CWD);
+        String blobId = blob.getId();
+
+        if (blob.exists() && headId.equals(blobId)) {
+            restrictedDelete(file);
+        }
+
+        writeStage(stage);
+    }
+
     /**
-     * helper methods
+     * helper functions
      */
     private Stage readStage() {
         return readObject(STAGE, Stage.class);
@@ -184,6 +214,7 @@ public class Repository {
         }
         return file;
     }
+
     private Commit getCommitFromBranchName(String branchName) {
         File branchFile = getBranchFile(branchName);
         return getCommitFromBranchFile(branchFile);
@@ -199,6 +230,7 @@ public class Repository {
         }
         return head;
     }
+
     /**
      * check methods
      */
