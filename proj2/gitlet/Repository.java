@@ -123,7 +123,7 @@ public class Repository {
             if (!blobId.equals(stageId)) {
                 join(STAGING_DIR, stageId).delete();
                 stage.getAdded().remove(stageId);
-                stage.getRemoved().remove(filename);
+                stage.getRemoved().add(filename);
                 writeStage(stage);
             }
         } else if (!blobId.equals(stageId)) {
@@ -134,6 +134,14 @@ public class Repository {
             stage.addFile(filename, blobId);
             writeStage(stage);
         }
+    }
+
+    public void commit(String message) {
+        if (message == null) {
+            System.out.println("Please enter a commit message.");
+        }
+        Commit head = getHead();
+        commitWith(message, List.of(head));
     }
 
     public void rm(String filename) {
@@ -148,7 +156,7 @@ public class Repository {
             System.exit(0);
         }
 
-        /** Unstage the file if it currently staged for addition */
+        // Un_stage the file if it currently staged for addition
         if (!stageId.equals("")) {
             stage.getAdded().remove(stageId);
         } else {
@@ -168,6 +176,17 @@ public class Repository {
     /**
      * helper functions
      */
+
+    private void commitWith(String message, List<Commit> parents) {
+        Stage stage = readStage();
+        if (stage.isEmpty()) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
+        Commit commit = new Commit(message, parents, stage);
+        clearStage();
+    }
+
     private Stage readStage() {
         return readObject(STAGE, Stage.class);
     }
@@ -175,6 +194,24 @@ public class Repository {
     private void writeStage(Stage stage) {
         writeObject(STAGE, stage);
     }
+
+    private void clearStage() {
+        File[] files = STAGING_DIR.listFiles();
+        if (files == null) {
+            return;
+        }
+        Path targetDir = BLOBS_DIR.toPath();
+        for (File file : files) {
+            Path source = file.toPath();
+            try {
+                Files.move(source, targetDir.resolve(source.getFileName()), REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeStage(new Stage());
+    }
+
     private void writeCommitToFile(Commit commit) {
         File file = join(COMMITS_DIR, commit.getId());
         writeObject(file, commit);
@@ -182,10 +219,6 @@ public class Repository {
 
     private String getHeadBranchName() {
         return readContentsAsString(HEAD);
-    }
-
-    private String getCommitIdFromBranchFile(File file) {
-        return readContentsAsString(file);
     }
 
     private Commit getCommitFromId(String commitId) {

@@ -26,7 +26,11 @@ public class Main {
                 repo.checkIfInitDirectoryExist();
                 repo.add(args[1]);
                 break;
-            // TODO: FILL THE REST IN
+            case "rm":
+                repo.checkCommandLength(args.length, 2);
+                repo.checkIfInitDirectoryExist();
+                repo.rm(args[1]);
+                break;
         }
     }
 
