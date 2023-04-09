@@ -47,7 +47,7 @@ public class Commit implements Serializable {
         this.timestamp = new Date();
         this.parents = new ArrayList<>(2);
         for (Commit p : parents) {
-            this.parents.add(p.getId());
+            this.parents.add(p.getID());
         }
         this.blobs = parents.get(0).getBlobs();
         for (Map.Entry<String, String> item : stage.getAdded().entrySet()) {
@@ -61,7 +61,7 @@ public class Commit implements Serializable {
         this.id = sha1(message, timestamp.toString(), parents.toString(), blobs.toString());
     }
 
-    public String getId() {
+    public String getID() {
         return id;
     }
 

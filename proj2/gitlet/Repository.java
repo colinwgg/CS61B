@@ -88,7 +88,7 @@ public class Repository {
 
         Commit inititalCommit = new Commit();
         writeCommitToFile(inititalCommit);
-        String id = inititalCommit.getId();
+        String id = inititalCommit.getID();
 
         String branchName = "master";
         File master = join(HEADS_DIR, branchName);
@@ -123,7 +123,7 @@ public class Repository {
             if (!blobId.equals(stageId)) {
                 join(STAGING_DIR, stageId).delete();
                 stage.getAdded().remove(stageId);
-                stage.getRemoved().add(filename);
+                stage.getRemoved().remove(filename);
                 writeStage(stage);
             }
         } else if (!blobId.equals(stageId)) {
@@ -137,8 +137,9 @@ public class Repository {
     }
 
     public void commit(String message) {
-        if (message == null) {
+        if (message.equals("")) {
             System.out.println("Please enter a commit message.");
+            System.exit(0);
         }
         Commit head = getHead();
         commitWith(message, List.of(head));
@@ -158,9 +159,9 @@ public class Repository {
 
         // Un_stage the file if it currently staged for addition
         if (!stageId.equals("")) {
-            stage.getAdded().remove(stageId);
+            stage.getAdded().remove(filename);
         } else {
-            stage.getRemoved().add(stageId);
+            stage.getRemoved().add(filename);
         }
 
         Blob blob = new Blob(filename, CWD);
@@ -171,6 +172,20 @@ public class Repository {
         }
 
         writeStage(stage);
+    }
+
+    public void log() {
+        StringBuffer result = new StringBuffer();
+        Commit head = getHead();
+        while (head != null) {
+            result.append(head.getCommitAsString());
+            head = getCommitFromId(head.getFirstParentId());
+        }
+        System.out.print(result);
+    }
+
+    public void global_log() {
+
     }
 
     /**
@@ -213,7 +228,7 @@ public class Repository {
     }
 
     private void writeCommitToFile(Commit commit) {
-        File file = join(COMMITS_DIR, commit.getId());
+        File file = join(COMMITS_DIR, commit.getID());
         writeObject(file, commit);
     }
 
@@ -284,7 +299,7 @@ public class Repository {
         System.exit(0);
     }
 
-    void checkIfInitDirectoryExist() {
+    void checkIfInitDirectoryExists() {
         if (!GITLET_DIR.isDirectory()) {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
