@@ -193,6 +193,22 @@ public class Repository {
         System.out.println(sb);
     }
 
+    public void find(String commitMessage) {
+        StringBuffer sb = new StringBuffer();
+        List<String> commitIds = plainFilenamesIn(COMMITS_DIR);
+        for (String commitId : commitIds) {
+            Commit commit = getCommitFromId(commitId);
+            if (commit.getMessage().contains(commitMessage)) {
+                sb.append(commit.getID() + "\n");
+            }
+        }
+        if (sb.length() == 0) {
+            System.out.println("Found no commit with that message.");
+            System.exit(0);
+        }
+        System.out.println(sb);
+    }
+
     /**
      * helper functions
      */
