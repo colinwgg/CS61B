@@ -1,7 +1,6 @@
 package gitlet;
 
 import java.io.*;
-import java.io.ObjectInputFilter.Config;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.*;
@@ -108,7 +107,7 @@ public class Repository {
     public void add(String filename) {
         File file = join(CWD, filename);
         if (!file.exists()) {
-            System.out.println("File doesn't exist");
+            System.out.println("File does not exist.");
             System.exit(0);
         }
 
@@ -175,17 +174,23 @@ public class Repository {
     }
 
     public void log() {
-        StringBuffer result = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         Commit head = getHead();
         while (head != null) {
-            result.append(head.getCommitAsString());
+            sb.append(head.getCommitAsString());
             head = getCommitFromId(head.getFirstParentId());
         }
-        System.out.print(result);
+        System.out.print(sb);
     }
 
     public void global_log() {
-
+        StringBuffer sb = new StringBuffer();
+        List<String> commitIds = plainFilenamesIn(COMMITS_DIR);
+        for (String commitId : commitIds) {
+            Commit commit = getCommitFromId(commitId);
+            sb.append(commit.getCommitAsString());
+        }
+        System.out.println(sb);
     }
 
     /**
@@ -200,6 +205,12 @@ public class Repository {
         }
         Commit commit = new Commit(message, parents, stage);
         clearStage();
+        writeCommitToFile(commit);
+
+        String branchName = getHeadBranchName();
+        File head = getBranchFile(branchName);
+        String commitId = commit.getID();
+        writeContents(head, commitId);
     }
 
     private Stage readStage() {

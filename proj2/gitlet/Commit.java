@@ -35,11 +35,11 @@ public class Commit implements Serializable {
     private String id;
 
     public Commit() {
-        message = "initial commit";
-        timestamp = new Date(0);
-        parents = new LinkedList<>();
-        blobs = new HashMap<>();
-        id = sha1(message, timestamp.toString());
+        this.message = "initial commit";
+        this.timestamp = new Date(0);
+        this.parents = new LinkedList<>();
+        this.blobs = new HashMap<>();
+        this.id = sha1(message, timestamp.toString());
     }
 
     public Commit(String message, List<Commit> parents, Stage stage) {
@@ -97,7 +97,7 @@ public class Commit implements Serializable {
         if (parents.size() == 2) {
             sb.append("Merge: " + parents.get(0).substring(0, 7) + " " +parents.get(1).substring(0, 7) + "\n");
         }
-        sb.append("Date: " + getDateString() + "\n");
+        sb.append("Date: " + this.getDateString() + "\n");
         sb.append(this.message + "\n\n");
         return sb.toString();
     }
