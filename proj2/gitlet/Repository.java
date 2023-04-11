@@ -209,6 +209,41 @@ public class Repository {
         System.out.println(sb);
     }
 
+    public void status() {
+        StringBuffer sb = new StringBuffer();
+
+        sb.append("=== Branches ===\n");
+        String headBranchName = getHeadBranchName();
+        List<String> branches = plainFilenamesIn(HEADS_DIR);
+        for (String branch : branches) {
+            if (branch.equals(headBranchName)) {
+                sb.append("*" + headBranchName + "\n");
+            } else {
+                sb.append(branch + "\n");
+            }
+        }
+        sb.append("\n");
+
+        sb.append("=== Staged Files ===\n");
+        Stage stage = readStage();
+        for (String filename : stage.getAdded().keySet()) {
+            sb.append(filename + "\n");
+        }
+        sb.append("\n");
+        sb.append("=== Removed Files ===\n");
+        for (String filename : stage.getRemoved()) {
+            sb.append(filename + "\n");
+        }
+        sb.append("\n");
+
+        sb.append("=== Modifications Not Staged For Commit ===\n");
+        sb.append("\n");
+        sb.append("=== Untracked Files ===\n");
+        sb.append("\n");
+
+        System.out.println(sb);
+    }
+
     /**
      * helper functions
      */

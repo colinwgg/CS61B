@@ -51,6 +51,11 @@ public class Main {
                 repo.checkIfInitDirectoryExists();
                 repo.find(args[1]);
                 break;
+            case "status":
+                repo.checkCommandLength(args.length, 1);
+                repo.checkIfInitDirectoryExists();
+                repo.status();
+                break;
         }
     }
 }
