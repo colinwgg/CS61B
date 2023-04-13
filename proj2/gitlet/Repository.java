@@ -473,8 +473,8 @@ public class Repository {
         }
     }
 
-    void checkEqual(String actual, String expected) {
-        if (!actual.equals(expected)) {
+    void checkEqual(String actual) {
+        if (!actual.equals("--")) {
             messageIncorrectOperands();
         }
     }

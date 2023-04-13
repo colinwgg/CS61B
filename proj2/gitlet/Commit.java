@@ -5,8 +5,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
-
 import static gitlet.Utils.*;
 
 /** Represents a gitlet commit object.

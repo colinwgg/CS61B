@@ -65,10 +65,10 @@ public class Main {
                 if (length == 2) {                              // checkout branch
                     repo.checkoutBranch(args[1]);
                 } else if (length == 3) {                       // checkout -- filename
-                    repo.checkEqual(args[1], "--");
+                    repo.checkEqual(args[1]);
                     repo.checkoutFileFromHead(args[2]);
                 } else {                                        // checkout commitId -- filename
-                    repo.checkEqual(args[2], "--");
+                    repo.checkEqual(args[2]);
                     repo.checkoutFileFromCommitId(args[1], args[3]);
                 }
             }
