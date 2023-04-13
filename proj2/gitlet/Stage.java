@@ -10,8 +10,8 @@ import java.util.HashSet;
  */
 public class Stage implements Serializable {
     // <filename, blobId>
-    private HashMap<String, String> added;
-    private HashSet<String> removed;
+    private final HashMap<String, String> added;
+    private final HashSet<String> removed;
 
     public Stage() {
         added = new HashMap<>();

@@ -14,25 +14,24 @@ import static gitlet.Utils.*;
  *  @author Colin Wang
  */
 public class Commit implements Serializable {
-    /**
-     *
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
+    /*
+      List all instance variables of the Commit class here with a useful
+      comment above them describing what that variable represents and how that
+      variable is used. We've provided one example for `message`.
      */
 
     /** The message of this Commit. */
-    private String message;
+    private final String message;
 
     /** The timestamp of this Commit */
-    private Date timestamp;
+    private final Date timestamp;
 
-    private List<String> parents;
+    private final List<String> parents;
 
     /** The file this Commit tracks (filename, blobId)*/
-    private HashMap<String, String> blobs;
+    private final HashMap<String, String> blobs;
 
-    private String id;
+    private final String id;
 
     public Commit() {
         this.message = "initial commit";
@@ -93,12 +92,12 @@ public class Commit implements Serializable {
     public String getCommitAsString() {
         StringBuffer sb = new StringBuffer();
         sb.append("===\n");
-        sb.append("commit " + this.id + "\n");
+        sb.append("commit ").append(this.id).append("\n");
         if (parents.size() == 2) {
-            sb.append("Merge: " + parents.get(0).substring(0, 7) + " " +parents.get(1).substring(0, 7) + "\n");
+            sb.append("Merge: ").append(parents.get(0).substring(0, 7)).append(" ").append(parents.get(1).substring(0, 7)).append("\n");
         }
-        sb.append("Date: " + this.getDateString() + "\n");
-        sb.append(this.message + "\n\n");
+        sb.append("Date: ").append(this.getDateString()).append("\n");
+        sb.append(this.message).append("\n\n");
         return sb.toString();
     }
 }

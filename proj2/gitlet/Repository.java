@@ -13,24 +13,24 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  *  @author Colin Wang
  */
 public class Repository {
-    /**
-     * List all instance variables of the Repository class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided two examples for you.
+    /*
+      List all instance variables of the Repository class here with a useful
+      comment above them describing what that variable represents and how that
+      variable is used. We've provided two examples for you.
      */
 
-    /**
-     * .gitlet
-     * -- staging
-     * -- [stage]
-     * -- blobs
-     * -- commits
-     * -- ref
-     *   -- heads -> [master][branch name]
-     *   -- remotes
-     *     -- [remote git repo name] -> [branch name]
-     * -- [HEAD]
-     * -- [config]
+    /*
+      .gitlet
+      -- staging
+      -- [stage]
+      -- blobs
+      -- commits
+      -- ref
+        -- heads -> [master][branch name]
+        -- remotes
+          -- [remote git repo name] -> [branch name]
+      -- [HEAD]
+      -- [config]
      */
     /**
      * The current working directory.
@@ -186,8 +186,10 @@ public class Repository {
     public void global_log() {
         StringBuffer sb = new StringBuffer();
         List<String> commitIds = plainFilenamesIn(COMMITS_DIR);
+        assert commitIds != null;
         for (String commitId : commitIds) {
             Commit commit = getCommitFromId(commitId);
+            assert commit != null;
             sb.append(commit.getCommitAsString());
         }
         System.out.println(sb);
@@ -196,10 +198,12 @@ public class Repository {
     public void find(String commitMessage) {
         StringBuffer sb = new StringBuffer();
         List<String> commitIds = plainFilenamesIn(COMMITS_DIR);
+        assert commitIds != null;
         for (String commitId : commitIds) {
             Commit commit = getCommitFromId(commitId);
+            assert commit != null;
             if (commit.getMessage().contains(commitMessage)) {
-                sb.append(commit.getID() + "\n");
+                sb.append(commit.getID()).append("\n");
             }
         }
         if (sb.length() == 0) {
@@ -215,11 +219,12 @@ public class Repository {
         sb.append("=== Branches ===\n");
         String headBranchName = getHeadBranchName();
         List<String> branches = plainFilenamesIn(HEADS_DIR);
+        assert branches != null;
         for (String branch : branches) {
             if (branch.equals(headBranchName)) {
-                sb.append("*" + headBranchName + "\n");
+                sb.append("*").append(headBranchName).append("\n");
             } else {
-                sb.append(branch + "\n");
+                sb.append(branch).append("\n");
             }
         }
         sb.append("\n");
@@ -227,12 +232,12 @@ public class Repository {
         sb.append("=== Staged Files ===\n");
         Stage stage = readStage();
         for (String filename : stage.getAdded().keySet()) {
-            sb.append(filename + "\n");
+            sb.append(filename).append("\n");
         }
         sb.append("\n");
         sb.append("=== Removed Files ===\n");
         for (String filename : stage.getRemoved()) {
-            sb.append(filename + "\n");
+            sb.append(filename).append("\n");
         }
         sb.append("\n");
 
@@ -286,12 +291,13 @@ public class Repository {
             String blobId = item.getValue();
             File file = join(CWD, filename);
             Blob blob = readObject(join(BLOBS_DIR, blobId), Blob.class);
-            writeContents(file, blob.getContent());
+            writeContents(file, (Object) blob.getContent());
         }
     }
 
     private void clearWorkingPlace() {
         File[] files = CWD.listFiles();
+        assert files != null;
         for (File file : files) {
             delFile(file);
         }
@@ -299,7 +305,7 @@ public class Repository {
 
     private void delFile(File file) {
         if (file.isDirectory()) {
-            for (File f : file.listFiles()) {
+            for (File f : Objects.requireNonNull(file.listFiles())) {
                 delFile(f);
             }
         }
@@ -327,7 +333,7 @@ public class Repository {
         List<String> res = new ArrayList<>();
         List<String> stageFiles = readStage().getStagedFilename();
         Set<String> headFiles = getHead().getBlobs().keySet();
-        for (String filename : plainFilenamesIn(CWD)) {
+        for (String filename : Objects.requireNonNull(plainFilenamesIn(CWD))) {
             if (!stageFiles.contains(filename) && !headFiles.contains(filename)) {
                 res.add(filename);
             }
@@ -344,7 +350,7 @@ public class Repository {
             System.exit(0);
         }
         Blob blob = getBlobFromId(blobId);
-        writeContents(file, blob.getContent());
+        writeContents(file, (Object) blob.getContent());
     }
 
     private String getCompleteCommitId (String commitId) {
@@ -352,7 +358,7 @@ public class Repository {
             return commitId;
         }
 
-        for (String id : COMMITS_DIR.list()) {
+        for (String id : Objects.requireNonNull(COMMITS_DIR.list())) {
             if (id.startsWith(commitId)) {
                 return id;
             }

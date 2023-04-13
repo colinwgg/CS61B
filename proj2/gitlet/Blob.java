@@ -10,9 +10,9 @@ import static gitlet.Utils.*;
  * Represent a file object.
  */
 public class Blob implements Serializable {
-    private String filename;
-    private String id;
-    private byte[] content;
+    private final String filename;
+    private final String id;
+    private final byte[] content;
 
     public Blob(String filename, File CWD) {
         this.filename = filename;

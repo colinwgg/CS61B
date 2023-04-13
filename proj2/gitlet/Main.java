@@ -16,62 +16,62 @@ public class Main {
         }
         Repository repo = new Repository();
         String firstArg = args[0];
-        switch(firstArg) {
-            case "init":
+        switch (firstArg) {
+            case "init" -> {
                 repo.checkCommandLength(args.length, 1);
                 repo.init();
-                break;
-            case "add":
+            }
+            case "add" -> {
                 repo.checkCommandLength(args.length, 2);
                 repo.checkIfInitDirectoryExists();
                 repo.add(args[1]);
-                break;
-            case "rm":
+            }
+            case "rm" -> {
                 repo.checkCommandLength(args.length, 2);
                 repo.checkIfInitDirectoryExists();
                 repo.rm(args[1]);
-                break;
-            case "commit":
+            }
+            case "commit" -> {
                 repo.checkCommandLength(args.length, 2);
                 repo.checkIfInitDirectoryExists();
                 repo.commit(args[1]);
-                break;
-            case "log":
+            }
+            case "log" -> {
                 repo.checkCommandLength(args.length, 1);
                 repo.checkIfInitDirectoryExists();
                 repo.log();
-                break;
-            case "global-log":
+            }
+            case "global-log" -> {
                 repo.checkCommandLength(args.length, 1);
                 repo.checkIfInitDirectoryExists();
                 repo.global_log();
-                break;
-            case "find":
+            }
+            case "find" -> {
                 repo.checkCommandLength(args.length, 2);
                 repo.checkIfInitDirectoryExists();
                 repo.find(args[1]);
-                break;
-            case "status":
+            }
+            case "status" -> {
                 repo.checkCommandLength(args.length, 1);
                 repo.checkIfInitDirectoryExists();
                 repo.status();
-                break;
-            case "checkout":
+            }
+            case "checkout" -> {
                 int length = args.length;
                 if (length < 2 || length > 4) {
                     System.out.println("Incorrect operands.");
                     System.exit(0);
                 }
-                if (length == 2) {                    // checkout branch
+                if (length == 2) {                              // checkout branch
                     repo.checkoutBranch(args[1]);
-                } else if (length == 3) {                           // checkout -- filename
+                } else if (length == 3) {                       // checkout -- filename
                     repo.checkEqual(args[1], "--");
                     repo.checkoutFileFromHead(args[2]);
-                } else if (length == 4) {                    // checkout commitId -- filename
+                } else {                                        // checkout commitId -- filename
                     repo.checkEqual(args[2], "--");
                     repo.checkoutFileFromCommitId(args[1], args[3]);
                 }
-                break;
+            }
         }
     }
 }
