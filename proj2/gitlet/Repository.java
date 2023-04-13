@@ -166,7 +166,7 @@ public class Repository {
         Blob blob = new Blob(filename, CWD);
         String blobId = blob.getId();
 
-        if (blob.exists() && headId.equals(blobId)) {
+        if (blob.exists() && blobId.equals(headId)) {
             restrictedDelete(file);
         }
 
@@ -244,9 +244,121 @@ public class Repository {
         System.out.println(sb);
     }
 
+    public void checkoutFileFromHead (String filename) {
+        Commit head = getHead();
+        checkoutFileFromCommit(head, filename);
+    }
+
+    public void checkoutFileFromCommitId (String commitId, String filename) {
+        String fullId = getCompleteCommitId(commitId);
+        Commit commit = getCommitFromId(fullId);
+        if (commit == null) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+        checkoutFileFromCommit(commit, filename);
+    }
+
+    public void checkoutBranch(String branchName) {
+        File branchFile = getBranchFile(branchName);
+        String headBranchName = getHeadBranchName();
+        if (branchFile == null || !branchFile.exists()) {
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        } else if (headBranchName.equals(branchName)) {
+            System.out.println("No need to checkout the current branch.");
+            System.exit(0);
+        }
+        Commit otherCommit = getCommitFromBranchFile(branchFile);
+        validUntrackedFiles(otherCommit.getBlobs());
+
+        replaceWorkingPlaceWithCommit(otherCommit);
+        writeContents(HEAD, branchName);
+    }
+
     /**
      * helper functions
      */
+    private void replaceWorkingPlaceWithCommit(Commit commit) {
+        clearWorkingPlace();
+        for (Map.Entry<String, String> item : commit.getBlobs().entrySet()) {
+            String filename = item.getKey();
+            String blobId = item.getValue();
+            File file = join(CWD, filename);
+            Blob blob = readObject(join(BLOBS_DIR, blobId), Blob.class);
+            writeContents(file, blob.getContent());
+        }
+    }
+
+    private void clearWorkingPlace() {
+        File[] files = CWD.listFiles();
+        for (File file : files) {
+            delFile(file);
+        }
+    }
+
+    private void delFile(File file) {
+        if (file.isDirectory()) {
+            for (File f : file.listFiles()) {
+                delFile(f);
+            }
+        }
+        file.delete();
+    }
+
+    private void validUntrackedFiles (Map<String, String> blobs) {
+        List<String> untrackedFiles = getUntrackedFiles();
+        if (untrackedFiles.isEmpty()) {
+            return;
+        }
+        for (String filename : untrackedFiles) {
+            String blobId = new Blob(filename, CWD).getId();
+            String otherId = blobs.getOrDefault(filename, "");
+            if (otherId.equals("")) {
+                continue;
+            } else if (!otherId.equals(blobId)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+        }
+    }
+
+    private List<String> getUntrackedFiles() {
+        List<String> res = new ArrayList<>();
+        List<String> stageFiles = readStage().getStagedFilename();
+        Set<String> headFiles = getHead().getBlobs().keySet();
+        for (String filename : plainFilenamesIn(CWD)) {
+            if (!stageFiles.contains(filename) && !headFiles.contains(filename)) {
+                res.add(filename);
+            }
+        }
+        Collections.sort(res);
+        return res;
+    }
+
+    private void checkoutFileFromCommit (Commit commit, String filename) {
+        File file = join(CWD, filename);
+        String blobId = commit.getBlobs().getOrDefault(filename, "");
+        if (blobId.equals("")) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+        Blob blob = getBlobFromId(blobId);
+        writeContents(file, blob.getContent());
+    }
+
+    private String getCompleteCommitId (String commitId) {
+        if (commitId.length() == UID_LENGTH) {
+            return commitId;
+        }
+
+        for (String id : COMMITS_DIR.list()) {
+            if (id.startsWith(commitId)) {
+                return id;
+            }
+        }
+        return null;
+    }
 
     private void commitWith(String message, List<Commit> parents) {
         Stage stage = readStage();
@@ -309,6 +421,11 @@ public class Repository {
     private Commit getCommitFromBranchFile(File file) {
         String commitId = readContentsAsString(file);
         return getCommitFromId(commitId);
+    }
+
+    private Blob getBlobFromId (String blobId) {
+        File file = join(BLOBS_DIR, blobId);
+        return readObject(file, Blob.class);
     }
 
     /** [branch]

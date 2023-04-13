@@ -56,6 +56,22 @@ public class Main {
                 repo.checkIfInitDirectoryExists();
                 repo.status();
                 break;
+            case "checkout":
+                int length = args.length;
+                if (length < 2 || length > 4) {
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+                if (length == 2) {                    // checkout branch
+                    repo.checkoutBranch(args[1]);
+                } else if (length == 3) {                           // checkout -- filename
+                    repo.checkEqual(args[1], "--");
+                    repo.checkoutFileFromHead(args[2]);
+                } else if (length == 4) {                    // checkout commitId -- filename
+                    repo.checkEqual(args[2], "--");
+                    repo.checkoutFileFromCommitId(args[1], args[3]);
+                }
+                break;
         }
     }
 }

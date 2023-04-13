@@ -9,6 +9,7 @@ import java.util.HashSet;
  * Representing a staging area.
  */
 public class Stage implements Serializable {
+    // <filename, blobId>
     private HashMap<String, String> added;
     private HashSet<String> removed;
 

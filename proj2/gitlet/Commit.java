@@ -29,7 +29,7 @@ public class Commit implements Serializable {
 
     private List<String> parents;
 
-    /** The file this Commit tracks */
+    /** The file this Commit tracks (filename, blobId)*/
     private HashMap<String, String> blobs;
 
     private String id;
