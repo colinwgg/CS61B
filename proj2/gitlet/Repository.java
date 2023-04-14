@@ -276,14 +276,55 @@ public class Repository {
         }
         Commit otherCommit = getCommitFromBranchFile(branchFile);
         validUntrackedFiles(otherCommit.getBlobs());
-
+        clearStage();
         replaceWorkingPlaceWithCommit(otherCommit);
         writeContents(HEAD, branchName);
+    }
+
+    public void branch(String branchName) {
+        File branch = join(HEADS_DIR, branchName);
+        if (branch.exists()) {
+            System.out.println("A branch with that name already exists.");
+            System.exit(0);
+        }
+        String commitId = getHeadCommitId();
+        writeContents(branch, commitId);
+    }
+
+    public void rm_branch(String branchName) {
+        File branch = join(HEADS_DIR, branchName);
+        if (!branch.exists()) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        String headBranchName = getHeadBranchName();
+        if (headBranchName.equals(branchName)) {
+            System.out.println("Cannot remove the current branch.");
+            System.exit(0);
+        }
+        branch.delete();
+    }
+
+    public void reset(String commitId) {
+        File file = join(COMMITS_DIR, commitId);
+        if (!file.exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+        Commit commit = getCommitFromId(commitId);
+        validUntrackedFiles(commit.getBlobs());
+        replaceWorkingPlaceWithCommit(commit);
+        clearStage();
+        writeContents(join(HEADS_DIR, getHeadBranchName()), commitId);
     }
 
     /**
      * helper functions
      */
+    private String getHeadCommitId() {
+        return getHead().getID();
+    }
+
     private void replaceWorkingPlaceWithCommit(Commit commit) {
         clearWorkingPlace();
         for (Map.Entry<String, String> item : commit.getBlobs().entrySet()) {

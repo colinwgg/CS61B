@@ -72,6 +72,21 @@ public class Main {
                     repo.checkoutFileFromCommitId(args[1], args[3]);
                 }
             }
+            case "branch" -> {
+                repo.checkCommandLength(args.length, 2);
+                repo.checkIfInitDirectoryExists();
+                repo.branch(args[1]);
+            }
+            case "rm-branch" -> {
+                repo.checkCommandLength(args.length, 2);
+                repo.checkIfInitDirectoryExists();
+                repo.rm_branch(args[1]);
+            }
+            case "reset" -> {
+                repo.checkCommandLength(args.length, 2);
+                repo.checkIfInitDirectoryExists();
+                repo.reset(args[1]);
+            }
         }
     }
 }
