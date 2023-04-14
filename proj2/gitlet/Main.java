@@ -82,11 +82,11 @@ public class Main {
                 repo.checkIfInitDirectoryExists();
                 repo.rm_branch(args[1]);
             }
-            case "reset" -> {
-                repo.checkCommandLength(args.length, 2);
-                repo.checkIfInitDirectoryExists();
-                repo.reset(args[1]);
-            }
+            //case "reset" -> {
+            //    repo.checkCommandLength(args.length, 2);
+            //    repo.checkIfInitDirectoryExists();
+            //    repo.reset(args[1]);
+            //}
         }
     }
 }

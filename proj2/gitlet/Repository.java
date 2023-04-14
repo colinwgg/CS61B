@@ -305,19 +305,6 @@ public class Repository {
         branch.delete();
     }
 
-    public void reset(String commitId) {
-        File file = join(COMMITS_DIR, commitId);
-        if (!file.exists()) {
-            System.out.println("No commit with that id exists.");
-            System.exit(0);
-        }
-        Commit commit = getCommitFromId(commitId);
-        validUntrackedFiles(commit.getBlobs());
-        replaceWorkingPlaceWithCommit(commit);
-        clearStage();
-        writeContents(join(HEADS_DIR, getHeadBranchName()), commitId);
-    }
-
     /**
      * helper functions
      */
@@ -361,9 +348,7 @@ public class Repository {
         for (String filename : untrackedFiles) {
             String blobId = new Blob(filename, CWD).getId();
             String otherId = blobs.getOrDefault(filename, "");
-            if (otherId.equals("")) {
-                continue;
-            } else if (!otherId.equals(blobId)) {
+            if (!otherId.equals(blobId)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
