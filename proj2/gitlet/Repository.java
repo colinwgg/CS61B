@@ -35,17 +35,17 @@ public class Repository {
     /**
      * The current working directory.
      */
-    public File CWD;
-    public File GITLET_DIR;
-    public File STAGING_DIR;
-    public File STAGE;
-    public File BLOBS_DIR;
-    public File COMMITS_DIR;
-    public File REFS_DIR;
-    public File HEADS_DIR;
-    public File REMOTES_DIR;
-    public File HEAD;
-    public File CONFIG;
+    private File CWD;
+    private File GITLET_DIR;
+    private File STAGING_DIR;
+    private File STAGE;
+    private File BLOBS_DIR;
+    private File COMMITS_DIR;
+    private File REFS_DIR;
+    private File HEADS_DIR;
+    private File REMOTES_DIR;
+    private File HEAD;
+    private File CONFIG;
 
     public Repository() {
         this.CWD = new File(System.getProperty("user.dir"));
@@ -249,12 +249,12 @@ public class Repository {
         System.out.println(sb);
     }
 
-    public void checkoutFileFromHead (String filename) {
+    public void checkoutFileFromHead(String filename) {
         Commit head = getHead();
         checkoutFileFromCommit(head, filename);
     }
 
-    public void checkoutFileFromCommitId (String commitId, String filename) {
+    public void checkoutFileFromCommitId(String commitId, String filename) {
         String fullId = getCompleteCommitId(commitId);
         Commit commit = getCommitFromId(fullId);
         if (commit == null) {
@@ -340,7 +340,7 @@ public class Repository {
         file.delete();
     }
 
-    private void validUntrackedFiles (Map<String, String> blobs) {
+    private void validUntrackedFiles(Map<String, String> blobs) {
         List<String> untrackedFiles = getUntrackedFiles();
         if (untrackedFiles.isEmpty()) {
             return;
@@ -368,7 +368,7 @@ public class Repository {
         return res;
     }
 
-    private void checkoutFileFromCommit (Commit commit, String filename) {
+    private void checkoutFileFromCommit(Commit commit, String filename) {
         File file = join(CWD, filename);
         String blobId = commit.getBlobs().getOrDefault(filename, "");
         if (blobId.equals("")) {
@@ -379,7 +379,7 @@ public class Repository {
         writeContents(file, (Object) blob.getContent());
     }
 
-    private String getCompleteCommitId (String commitId) {
+    private String getCompleteCommitId(String commitId) {
         if (commitId.length() == UID_LENGTH) {
             return commitId;
         }
@@ -455,22 +455,13 @@ public class Repository {
         return getCommitFromId(commitId);
     }
 
-    private Blob getBlobFromId (String blobId) {
+    private Blob getBlobFromId(String blobId) {
         File file = join(BLOBS_DIR, blobId);
         return readObject(file, Blob.class);
     }
 
-    /** [branch]
-     *  [R1/branch]
-     */
     private File getBranchFile(String branchName) {
-        File file = null;
-        String[] branch = branchName.split("/");
-        if (branch.length == 1) {
-            file = join(HEADS_DIR, branchName);
-        } else if(branch.length == 2) {
-            file = join(REMOTES_DIR, branch[0], branch[1]);
-        }
+        File file = join(HEADS_DIR, branchName);
         return file;
     }
 
