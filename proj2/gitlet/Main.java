@@ -44,7 +44,7 @@ public class Main {
             case "global-log" -> {
                 repo.checkCommandLength(args.length, 1);
                 repo.checkIfInitDirectoryExists();
-                repo.global_log();
+                repo.globalLog();
             }
             case "find" -> {
                 repo.checkCommandLength(args.length, 2);
@@ -80,13 +80,17 @@ public class Main {
             case "rm-branch" -> {
                 repo.checkCommandLength(args.length, 2);
                 repo.checkIfInitDirectoryExists();
-                repo.rm_branch(args[1]);
+                repo.rmBranch(args[1]);
             }
             //case "reset" -> {
             //    repo.checkCommandLength(args.length, 2);
             //    repo.checkIfInitDirectoryExists();
             //    repo.reset(args[1]);
             //}
+            default -> {
+                System.out.println("No command with that name exists.");
+                System.exit(0);
+            }
         }
     }
 }

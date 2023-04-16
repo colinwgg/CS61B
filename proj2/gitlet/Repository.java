@@ -183,7 +183,7 @@ public class Repository {
         System.out.print(sb);
     }
 
-    public void global_log() {
+    public void globalLog() {
         StringBuffer sb = new StringBuffer();
         List<String> commitIds = plainFilenamesIn(COMMITS_DIR);
         assert commitIds != null;
@@ -267,14 +267,14 @@ public class Repository {
     public void checkoutBranch(String branchName) {
         File branchFile = getBranchFile(branchName);
         String headBranchName = getHeadBranchName();
-        if (branchFile == null || !branchFile.exists()) {
+        if (!branchFile.exists()) {
             System.out.println("No such branch exists.");
             System.exit(0);
         } else if (headBranchName.equals(branchName)) {
             System.out.println("No need to checkout the current branch.");
             System.exit(0);
         }
-        Commit otherCommit = getCommitFromBranchFile(branchFile);
+        Commit otherCommit = getCommitFromBranchName(branchName);
         validUntrackedFiles(otherCommit.getBlobs());
         clearStage();
         replaceWorkingPlaceWithCommit(otherCommit);
@@ -291,7 +291,7 @@ public class Repository {
         writeContents(branch, commitId);
     }
 
-    public void rm_branch(String branchName) {
+    public void rmBranch(String branchName) {
         File branch = join(HEADS_DIR, branchName);
         if (!branch.exists()) {
             System.out.println("A branch with that name does not exist.");
@@ -319,7 +319,7 @@ public class Repository {
             String blobId = item.getValue();
             File file = join(CWD, filename);
             Blob blob = readObject(join(BLOBS_DIR, blobId), Blob.class);
-            writeContents(file, (Object) blob.getContent());
+            writeContents(file, blob.getContent());
         }
     }
 
