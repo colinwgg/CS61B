@@ -92,7 +92,8 @@ public class Commit implements Serializable {
         sb.append("===\n");
         sb.append("commit ").append(this.id).append("\n");
         if (parents.size() == 2) {
-            sb.append("Merge: ").append(parents.get(0).substring(0, 7)).append(" ").append(parents.get(1).substring(0, 7)).append("\n");
+            sb.append("Merge: ").append(parents.get(0).substring(0, 7)).append(" ").
+                    append(parents.get(1).substring(0, 7)).append("\n");
         }
         sb.append("Date: ").append(this.getDateString()).append("\n");
         sb.append(this.message).append("\n\n");
