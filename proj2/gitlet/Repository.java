@@ -305,6 +305,21 @@ public class Repository {
         branch.delete();
     }
 
+    public void reset(String commitId) {
+        File file = join(COMMITS_DIR, commitId);
+        if (!file.exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+        Commit commit = getCommitFromId(commitId);
+        assert commit != null;
+        validUntrackedFiles(commit.getBlobs());
+        replaceWorkingPlaceWithCommit(commit);
+        clearStage();
+        String headBranchName = getHeadBranchName();
+        writeContents(join(HEADS_DIR, headBranchName), commitId);
+    }
+
     /**
      * helper functions
      */
