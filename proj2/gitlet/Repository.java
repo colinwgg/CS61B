@@ -72,8 +72,7 @@ public class Repository {
 
     public void init() {
         if (GITLET_DIR.exists() && GITLET_DIR.isDirectory()) {
-            System.out.println("A Gitlet version-control system already exists " +
-                    "in the current directory");
+            System.out.println("A Gitlet version-control system already exists in the current directory");
             System.exit(0);
         }
 
@@ -350,8 +349,7 @@ public class Repository {
             String blobId = new Blob(filename, CWD).getId();
             String otherId = blobs.getOrDefault(filename, "");
             if (!otherId.equals(blobId)) {
-                System.out.println("There is an untracked file in the way; delete it, " +
-                        "or add and commit it first.");
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
         }
