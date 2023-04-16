@@ -63,11 +63,11 @@ public class Commit implements Serializable {
     }
 
     public HashMap<String, String> getBlobs() {
-        return blobs;
+        return this.blobs;
     }
 
     public String getMessage() {
-        return message;
+        return this.message;
     }
 
     public List<String> getParents() {

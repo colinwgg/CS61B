@@ -35,7 +35,7 @@ public class Repository {
     /**
      * The current working directory.
      */
-    private File CWD;
+    private final File CWD;
     private File GITLET_DIR;
     private File STAGING_DIR;
     private File STAGE;

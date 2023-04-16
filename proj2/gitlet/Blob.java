@@ -27,7 +27,7 @@ public class Blob implements Serializable {
     }
 
     public boolean exists() {
-        return this.content == null;
+        return this.content != null;
     }
 
     public String getFilename() {
