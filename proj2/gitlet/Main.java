@@ -87,10 +87,6 @@ public class Main {
             //    repo.checkIfInitDirectoryExists();
             //    repo.reset(args[1]);
             //}
-            default -> {
-                System.out.println("No command with that name exists.");
-                System.exit(0);
-            }
         }
     }
 }
