@@ -334,17 +334,19 @@ public class Repository {
             String blobId = item.getValue();
             File file = join(CWD, filename);
             Blob blob = readObject(join(BLOBS_DIR, blobId), Blob.class);
-            writeContents(file, blob.getContent());
+            writeContents(file, (Object) blob.getContent());
         }
     }
 
     private void clearWorkingPlace() {
-        File[] files = CWD.listFiles();
+        File[] files = CWD.listFiles(gitletFilter);
         assert files != null;
         for (File file : files) {
             delFile(file);
         }
     }
+
+    private final FilenameFilter gitletFilter = (dir, name) -> !name.equals(".gitlet");
 
     private void delFile(File file) {
         if (file.isDirectory()) {
@@ -453,10 +455,6 @@ public class Repository {
         writeObject(file, commit);
     }
 
-    private String getHeadBranchName() {
-        return readContentsAsString(HEAD);
-    }
-
     private Commit getCommitFromId(String commitId) {
         File file = join(COMMITS_DIR, commitId);
         if (commitId.equals("null") || !file.exists()) {
@@ -476,13 +474,16 @@ public class Repository {
     }
 
     private File getBranchFile(String branchName) {
-        File file = join(HEADS_DIR, branchName);
-        return file;
+        return join(HEADS_DIR, branchName);
     }
 
     private Commit getCommitFromBranchName(String branchName) {
         File branchFile = getBranchFile(branchName);
         return getCommitFromBranchFile(branchFile);
+    }
+
+    private String getHeadBranchName() {
+        return readContentsAsString(HEAD);
     }
 
     private Commit getHead() {
