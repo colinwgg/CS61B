@@ -87,6 +87,15 @@ public class Main {
                 repo.checkIfInitDirectoryExists();
                 repo.reset(args[1]);
             }
+            case "merge" -> {
+                repo.checkCommandLength(args.length, 2);
+                repo.checkIfInitDirectoryExists();
+                repo.merge(args[1]);
+            }
+            default -> {
+                System.out.println("No command with that name exists.");
+                System.exit(0);
+            }
         }
     }
 }

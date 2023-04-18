@@ -320,9 +320,188 @@ public class Repository {
         writeContents(join(HEADS_DIR, headBranchName), commitId);
     }
 
+    public void merge(String branchName) {
+        Stage stage = readStage();
+        if (!stage.isEmpty()) {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+        File otherBranchFile = getBranchFile(branchName);
+        if (!otherBranchFile.exists()) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        String headBranchName = getHeadBranchName();
+        if (branchName.equals(headBranchName)) {
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+
+        Commit head = getHead();
+        Commit other = getCommitFromBranchName(branchName);
+        Commit splitPoint = getSplitPoint(head, other);
+
+        if (head.getID().equals(splitPoint.getID())) {
+            checkoutBranch(branchName);
+            System.out.println("Current branch fast-forwarded.");
+            return;
+        } // No.1
+        if (other.getID().equals(splitPoint.getID())) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            return;
+        } // No.2
+        mergeWith(splitPoint, head, other);
+        String message = "Merged " + branchName + "into" + getHeadBranchName() + ".";
+        List<Commit> parents = List.of(head, other);
+        commitWith(message, parents);
+    }
+
     /**
      * helper functions
      */
+    private void mergeWith(Commit splitPoint, Commit head, Commit other) {
+        Set<String> allFilenames = getAllFilenames(splitPoint, head, other);
+        List<String> rewrite = new ArrayList<>();
+        List<String> remove = new ArrayList<>();
+        List<String> conflict = new ArrayList<>();
+
+        for (String filename : allFilenames) {
+            String sId = splitPoint.getBlobs().getOrDefault(filename, "");
+            String hId = head.getBlobs().getOrDefault(filename, "");
+            String oId = other.getBlobs().getOrDefault(filename, "");
+            if (sId.equals(oId) || hId.equals(oId)) {
+                continue;
+            } // NO.3-1, No.4, No.7
+            if (sId.equals(hId)) {
+                if (oId.equals("")) {
+                    remove.add(filename); // No.6
+                } else {
+                    rewrite.add(filename); // No.5
+                }
+            } else {
+                conflict.add(filename); // No.3-2
+            }
+        }
+
+        List<String> untrackedFiles = getUntrackedFiles();
+        for (String filename : untrackedFiles) {
+            if (rewrite.contains(filename) || remove.contains(filename) || conflict.contains(filename)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+        }
+
+        if (!remove.isEmpty()) {
+            for (String filename : remove) {
+                rm(filename);
+            }
+        }
+        if (!rewrite.isEmpty()) {
+            for (String filename : rewrite) {
+                String oId = other.getBlobs().getOrDefault(filename, "");
+                Blob blob = getBlobFromId(oId);
+                File file = join(CWD, filename);
+                writeContents(file, (Object) blob.getContent());
+                add(filename);
+            }
+        }
+        if (!conflict.isEmpty()) {
+            for (String filename : conflict) {
+                String oId = other.getBlobs().getOrDefault(filename, "");
+                String hId = head.getBlobs().getOrDefault(filename, "");
+                String headContent = getBlobContentFromId(hId);
+                String otherContent = getBlobContentFromId(oId);
+                String content = getConflictFile(headContent.split("\n"), otherContent.split("\n"));
+                File file = join(CWD, filename);
+                writeContents(file, content);
+                System.out.println("Encountered a merge conflict.");
+            }
+        }
+    }
+
+    private String getConflictFile(String[] head, String[] other) {
+        StringBuffer sb = new StringBuffer();
+        int h = 0, o = 0, headLength = head.length, otherLength = other.length;
+        while (h < headLength && o < otherLength) {
+            if (head[h].equals(other[o])) {
+                sb.append(head[h]);
+            } else {
+                sb.append(getConflictContent(head[h], other[o]));
+            }
+            h += 1;
+            o += 1;
+        }
+        while (h < headLength) {
+            sb.append(getConflictContent(head[h], ""));
+            h += 1;
+        }
+        while (o < otherLength) {
+            sb.append(getConflictContent("", other[o]));
+            o += 1;
+        }
+        return sb.toString();
+    }
+
+    private String getConflictContent(String head, String other) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("<<<<<<< HEAD\n");
+        sb.append(head.equals("") ? head : head + "\n");
+        sb.append("=======\n");
+        sb.append(other.equals("") ? other : other + "\n");
+        sb.append(">>>>>>>\n");
+        return sb.toString();
+    }
+
+    private String getBlobContentFromId(String id) {
+        if (id.equals("")) {
+            return "";
+        }
+        return getBlobFromId(id).getContentAsString();
+    }
+
+    private Set<String> getAllFilenames(Commit splitPoint, Commit head, Commit other) {
+        Set<String> res = new HashSet<>();
+        res.addAll(splitPoint.getBlobs().keySet());
+        res.addAll(head.getBlobs().keySet());
+        res.addAll(other.getBlobs().keySet());
+        return res;
+    }
+
+    // this method return the latest common ancestor of the two commits.
+    private Commit getSplitPoint(Commit head, Commit other) {
+        Set<String> headAncestors = bfsFromCommit(head);
+        Queue<Commit> queue = new LinkedList<>();
+        queue.add(other);
+        while (!queue.isEmpty()) {
+            Commit commit = queue.poll();
+            if (headAncestors.contains(commit.getID())) {
+                return commit;
+            }
+            if (!commit.getParents().isEmpty()) {
+                for (String id : commit.getParents()) {
+                    queue.add(getCommitFromId(id));
+                }
+            }
+        }
+        return new Commit();
+    }
+
+    private Set<String> bfsFromCommit(Commit head) {
+        Set<String> res = new HashSet<>();
+        Queue<Commit> queue = new LinkedList<>();
+        queue.add(head);
+        while (!queue.isEmpty()) {
+            Commit commit = queue.poll();
+            if (!commit.getParents().isEmpty()) {
+                for (String id : commit.getParents()) {
+                     queue.add(getCommitFromId(id));
+                }
+            }
+            res.add(commit.getID());
+        }
+        return res;
+    }
+
     private String getHeadCommitId() {
         return getHead().getID();
     }
