@@ -72,7 +72,8 @@ public class Repository {
 
     public void init() {
         if (GITLET_DIR.exists() && GITLET_DIR.isDirectory()) {
-            System.out.println("A Gitlet version-control system already exists in the current directory");
+            System.out.println("A Gitlet version-control system already exists " +
+                    "in the current directory");
             System.exit(0);
         }
 
@@ -97,13 +98,6 @@ public class Repository {
         writeContents(CONFIG, "");
     }
 
-    /**
-     * 1. Staging an already-staged file overwrites the previous entry in the staging area with the new contents.
-     * 2. If the current working version of the file is identical to the version in the current commit,
-     * do not stage it to be added, and remove it from the staging area if it is already there
-     * (as can happen when a file is changed, added, and then changed back to its original version).
-     * 3. The file will no longer be staged for removal (see gitlet rm), if it was at the time of the command.
-     */
     public void add(String filename) {
         File file = join(CWD, filename);
         if (!file.exists()) {
@@ -385,8 +379,10 @@ public class Repository {
 
         List<String> untrackedFiles = getUntrackedFiles();
         for (String filename : untrackedFiles) {
-            if (rewrite.contains(filename) || remove.contains(filename) || conflict.contains(filename)) {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            if (rewrite.contains(filename) || remove.contains(filename) ||
+                    conflict.contains(filename)) {
+                System.out.println("There is an untracked file in the way; delete it, " +
+                        "or add and commit it first.");
                 System.exit(0);
             }
         }
@@ -545,7 +541,8 @@ public class Repository {
             String blobId = new Blob(filename, CWD).getId();
             String otherId = blobs.getOrDefault(filename, "");
             if (!otherId.equals(blobId)) {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.out.println("There is an untracked file in the way; delete it, " +
+                        "or add and commit it first.");
                 System.exit(0);
             }
         }
