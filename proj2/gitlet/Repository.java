@@ -351,7 +351,7 @@ public class Repository {
             return;
         } // No.2
         mergeWith(splitPoint, head, other);
-        String message = "Merged " + branchName + "into" + getHeadBranchName() + ".";
+        String message = "Merged " + branchName + " into " + getHeadBranchName() + ".";
         List<Commit> parents = List.of(head, other);
         commitWith(message, parents);
     }
@@ -494,7 +494,7 @@ public class Repository {
             Commit commit = queue.poll();
             if (!commit.getParents().isEmpty()) {
                 for (String id : commit.getParents()) {
-                     queue.add(getCommitFromId(id));
+                    queue.add(getCommitFromId(id));
                 }
             }
             res.add(commit.getID());
